@@ -7,7 +7,7 @@ function Wallet({ address, setAddress, balance, setBalance }) {
     if (address) {
       const {
         data: { balance },
-      } = await server.get(`balance/${address}`);
+      } = await server.get(`https://ecdsa-node-nine.vercel.app/balance/${address}`);
       setBalance(balance);
     } else {
       setBalance(0);

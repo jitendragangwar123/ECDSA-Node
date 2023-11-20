@@ -13,7 +13,7 @@ function Transfer({ address, setBalance }) {
     try {
       const {
         data: { balance },
-      } = await server.post(`send`, {
+      } = await server.post(`https://ecdsa-node-nine.vercel.app/send`, {
         sender: address,
         amount: parseInt(sendAmount),
         recipient,
