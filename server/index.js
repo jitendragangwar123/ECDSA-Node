@@ -7,7 +7,7 @@ const port = 3042;
 
 app.use(cors(
   {
-    origin:[""],
+    origin:["https://ecdsa-node-front-end.vercel.app"],
     methods:["POST","GET"],
     credentials:true
   }
