@@ -31,10 +31,10 @@ app.post("/send", (req, res) => {
   const { sender, recipient, amount,signature,recovery} = req.body;
 
   if(!signature){
-    res.status(404).send({ message: "signature dont was provide" });
+    res.status(404).send({ message: "signature not provided!" });
   }
   if(!recovery){
-    res.status(400).send({ message: "recovery dont was provide" });
+    res.status(400).send({ message: "recovery not provided!" });
   }
 
   try {
