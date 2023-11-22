@@ -18,13 +18,14 @@ function Transfer({ address, setBalance ,privateKey}) {
     const hash = keccak256(bytes);
     const signature = await secp256k1.sign(hash, privateKey);
 
-    var sig = Array.from(signature[0])
+    const sig = Array.from(Object.values(signature));
+    //console.log(sig[0]);
 
     try {
       const {
         data: { balance },
       } = await server.post(`https://ecdsa-node-nine.vercel.app/send`, {
-        ...data, signature: sig, recovery: signature[1]
+        ...data, signature: sig, recovery: sig[2]
       });
       setBalance(balance);
     } catch (ex) {
