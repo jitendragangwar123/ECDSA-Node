@@ -31,25 +31,25 @@ app.post("/send", (req, res) => {
   const { sender, recipient, amount,signature,recovery} = req.body;
 
   if(!signature){
-    res.status(404).send({ message: "signature not provided!" });
+    res.status(404).send({ 
+      message: "signature not provided!" 
+    });
   }
   if(!recovery){
-    res.status(400).send({ message: "recovery not provided!" });
+    res.status(400).send({ 
+      message: "recovery not provided!" 
+    });
   }
 
   try {
-    
     const bytes = utf8ToBytes(JSON.stringify({ sender, recipient, amount }));
     const hash = keccak256(bytes);
-
     const sig = new Uint8Array(signature);
-
     const publicKey = secp256k1.recoverPublicKey(hash, sig, recovery);
-    const address=keccak256(publicKey.slice(1)).slice(-20);
-    
-
-    if('0x'+toHex(address) !== sender){
-      res.status(400).send({ message: "signature no is valid" });
+    if(toHex(publicKey) !== sender){
+      res.status(400).send({
+        message: "signature not valid!" 
+      });
     }
 
 
