@@ -30,7 +30,7 @@ function Wallet({ address, setAddress, balance, setBalance,privateKey, setPrivat
       </label>
 
       <div>
-        Address: {'0x'+toHex(keccak256(address.slice(1)).slice(-20))}
+        Address: {(address.slice(1)).slice(-20))}
       </div>
 
       <div className="balance">Balance: {balance}</div>
