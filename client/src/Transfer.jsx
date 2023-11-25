@@ -22,13 +22,13 @@ function Transfer({ address, setBalance, privateKey }) {
 
     var sig = Array.from(signature[0]);
     //console.log(sig);
-    const recKey=signature[1];
+    const recKey = signature[1];
     //console.log(recKey)
-    
+
     try {
       const {
         data: { balance },
-      } = await server.post(`send`, {
+      } = await server.post(`https://ecdsa-node-nine.vercel.app/send`, {
         ...data,
         signature: sig,
         recovery: recKey,

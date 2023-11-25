@@ -2,17 +2,17 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const port = 3042;
-const secp=require("ethereum-cryptography/secp256k1");
+const secp = require("ethereum-cryptography/secp256k1");
 const { keccak256 } = require("ethereum-cryptography/keccak");
 const { toHex, utf8ToBytes } = require("ethereum-cryptography/utils");
 
 app.use(cors(
-  // {
-  //   origin:[""],
-  //   methods:["POST","GET"],
-  //   credentials:true
-  // }
-  )
+  {
+    origin:["https://ecdsa-node-front-end.vercel.app"],
+    methods:["POST","GET"],
+    credentials:true
+  }
+)
 );
 app.use(express.json());
 
@@ -36,13 +36,13 @@ app.post("/send", (req, res) => {
   if (!signature) {
     res.status(404).send({ message: "signature not provided!" });
   }
-  
+
 
   try {
     const bytes = utf8ToBytes(JSON.stringify({ sender, recipient, amount }));
     const hash = keccak256(bytes);
     const sig = new Uint8Array(signature);
-    const publicKey = secp.recoverPublicKey(hash, sig, recovery);  
+    const publicKey = secp.recoverPublicKey(hash, sig, recovery);
 
     if (toHex(publicKey) !== sender) {
       res.status(400).send({ message: "signature not valid" });
