@@ -2,23 +2,24 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const port = 3042;
-const {secp256k1}=require("ethereum-cryptography/secp256k1");
-const {keccak256}=require("ethereum-cryptography/keccak");
-const {toHex,utf8ToBytes}=require("ethereum-cryptography/utils");
+const secp=require("ethereum-cryptography/secp256k1");
+const { keccak256 } = require("ethereum-cryptography/keccak");
+const { toHex, utf8ToBytes } = require("ethereum-cryptography/utils");
 
 app.use(cors(
-  {
-    origin:["https://ecdsa-node-front-end.vercel.app"],
-    methods:["POST","GET"],
-    credentials:true
-  }
-));
+  // {
+  //   origin:[""],
+  //   methods:["POST","GET"],
+  //   credentials:true
+  // }
+  )
+);
 app.use(express.json());
 
 const balances = {
-  "0xa81359e9ba1a177bcea09ab8afe195c8b35bd41a": 100,
-  "0x8b399a80972f9403937b50d2739bd04ca4e0c2b5": 50,
-  "0xbc2cdc665bf7cd720e44fe345f5a6863584ce047": 75,
+  "0421f0bdece5569a326bfa806137b99f764100ecf44ad58e1068fb0d2cbc405d1d210442f3eafc0f8920c993d73277167601623c85ceaf4fb867dfa6a84fa78085": 100,
+  "04433b6b7af2ffec984ccd8abe68401edecc1cf8430b4b7e6b3fdd6853f395bc19e5067ae587584bad894b1f493872e88714752c04b9ffdcc3bf4275de971fbc51": 50,
+  "048feea4347949844ccc18c918de76fef786e92b978ff3f3350b1f1ae933340b259bece6d933bc4add5dcc4569a18781fdffb6abb0212617a47d0e4cd3589ef0ba": 95,
 };
 
 app.get("/balance/:address", (req, res) => {
@@ -28,44 +29,35 @@ app.get("/balance/:address", (req, res) => {
 });
 
 app.post("/send", (req, res) => {
-  const { sender, recipient, amount,signature,recovery} = req.body;
+  const { sender, recipient, amount, signature, recovery } = req.body;
 
-  if(!signature){
+  if (!signature) {
     res.status(404).send({ message: "signature not provided!" });
   }
-  if(!recovery){
-    res.status(400).send({ message: "recovery not provided!" });
-  }
-
+  
   try {
-    
     const bytes = utf8ToBytes(JSON.stringify({ sender, recipient, amount }));
     const hash = keccak256(bytes);
-
     const sig = new Uint8Array(signature);
+    const publicKey = secp.recoverPublicKey(hash, sig, recovery);  
 
-    const publicKey = secp256k1.recoverPublicKey(hash, sig, recovery);
-    const address=keccak256(publicKey.slice(1)).slice(-20);
-    
-
-    if('0x'+toHex(address) !== sender){
-      res.status(400).send({ message: "signature no is valid" });
+    if (toHex(publicKey) !== sender) {
+      res.status(400).send({ message: "signature not valid" });
     }
 
+    setInitialBalance(sender);
+    setInitialBalance(recipient);
 
-  setInitialBalance(sender);
-  setInitialBalance(recipient);
-
-  if (balances[sender] < amount) {
-    res.status(400).send({ message: "Not enough funds!" });
-  } else {
-    balances[sender] -= amount;
-    balances[recipient] += amount;
-    res.send({ balance: balances[sender] });
+    if (balances[sender] < amount) {
+      res.status(400).send({ message: "Not enough funds!" });
+    } else {
+      balances[sender] -= amount;
+      balances[recipient] += amount;
+      res.send({ balance: balances[sender] });
+    }
+  } catch (error) {
+    console.log(error.message);
   }
-} catch (error) {
-  console.log(error.message)
-}
 });
 
 app.listen(port, () => {
@@ -77,3 +69,5 @@ function setInitialBalance(address) {
     balances[address] = 0;
   }
 }
+
+
