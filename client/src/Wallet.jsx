@@ -37,8 +37,6 @@ function Wallet({ address, setAddress, balance, setBalance,privateKey, setPrivat
       <div>
         Address: {(address.slice(1)).slice(-40)}
       </div>
-
-
       <div className="balance">Balance: {balance}</div>
     </div>
   );
