@@ -23,6 +23,9 @@ const balances = {
 
 };
 
+app.get("/",(req,res)=>{
+  res.send({ message: "Welcome to ECDSA-Node Application!" });
+})
 app.get("/balance/:address", (req, res) => {
   const { address } = req.params;
   const balance = balances[address] || 0;
@@ -31,13 +34,9 @@ app.get("/balance/:address", (req, res) => {
 
 app.post("/send", (req, res) => {
   const { sender, recipient, amount, signature, recovery } = req.body;
-
-
   if (!signature) {
     res.status(404).send({ message: "signature not provided!" });
   }
-
-
   try {
     const bytes = utf8ToBytes(JSON.stringify({ sender, recipient, amount }));
     const hash = keccak256(bytes);
@@ -46,7 +45,6 @@ app.post("/send", (req, res) => {
 
     if (toHex(publicKey) !== sender) {
       res.status(400).send({ message: "signature not valid" });
-
     }
 
     setInitialBalance(sender);
@@ -64,14 +62,16 @@ app.post("/send", (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Listening on port ${port}!`);
-});
-
 function setInitialBalance(address) {
   if (!balances[address]) {
     balances[address] = 0;
   }
 }
+
+app.listen(port, () => {
+  console.log(`Listening on port ${port}!`);
+});
+
+
 
 
